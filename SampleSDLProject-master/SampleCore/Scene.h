@@ -9,9 +9,9 @@ namespace scene {
 	public:
 		Scene();
 		virtual ~Scene();
-		bool Init();
-		void Update();
-		void Draw() const;
-		bool Shutdown();
+		virtual bool Init();
+		virtual void Update();
+		virtual void Draw() const;
+		virtual bool Shutdown();
 	};
 }

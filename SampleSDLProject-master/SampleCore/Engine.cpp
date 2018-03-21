@@ -2,8 +2,8 @@
 #include "Engine.h"
 
 #include <iostream>
-
-#include <SDL\SDL.h>
+#include "SystemManager.h"
+//#include <SDL\SDL.h>
 #include <stdio.h>
 
 namespace core {
@@ -11,8 +11,10 @@ namespace core {
 	const int SCREEN_WIDTH = 640;
 	const int SCREEN_HEIGHT = 480;
 
-	Engine::Engine()
+	Engine::Engine(scene::Scene* _mainScene) : mainScene(_mainScene)
 	{
+		isRunning = false;
+		//managers.push_back(new SystemManager());
 	}
 
 
@@ -20,18 +22,15 @@ namespace core {
 	{
 	}
 
-	void Engine::init()
+	int Engine::init()
 	{
-		//The window we'll be rendering to
-		SDL_Window* window = NULL;
-
-		//The surface contained by the window
-		SDL_Surface* screenSurface = NULL;
-
+		int initResult = 0;
 		//Initialize SDL
-		if (SDL_Init(SDL_INIT_VIDEO) < 0)
+		if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
 		{
 			printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
+
+			initResult = ENGINE_INIT_ERROR;
 		}
 		else
 		{
@@ -40,21 +39,60 @@ namespace core {
 			if (window == NULL)
 			{
 				printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
+
+				initResult = ENGINE_INIT_ERROR;
 			}
 			else
 			{
 				//Get window surface
 				screenSurface = SDL_GetWindowSurface(window);
 
-				//Fill the surface white
-				SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
-
-				//Update the surface
-				SDL_UpdateWindowSurface(window);
-
 				//Wait two seconds
-				SDL_Delay(2000);
+				//SDL_Delay(2000);
 			}
+		}
+		return initResult;
+	}
+
+	int Engine::run() {
+		isRunning = true;
+
+		while (!inputSystem.QuitRequested())
+		{
+			// Update
+			Update();
+			// Render
+			Draw();
+
+		}
+
+		return Shutdown();
+
+	}
+
+	bool Engine::Init() {
+		mainScene->Init();
+
+		return true;
+	}
+
+	void Engine::Update() {
+		mainScene->Update();
+		inputSystem.Update();
+		//Fill the surface white
+		SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
+
+		//Update the surface
+		SDL_UpdateWindowSurface(window);
+	}
+
+	void Engine::Draw() const{
+		mainScene->Draw();
+	}
+
+	bool Engine::Shutdown() {
+		if (!mainScene->Shutdown()) {
+			return 1;
 		}
 
 		//Destroy window
@@ -62,6 +100,8 @@ namespace core {
 
 		//Quit SDL subsystems
 		SDL_Quit();
+
+		return 0;
 	}
 
 	void Engine::print()
