@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include "SystemManager.h"
-//#include <SDL\SDL.h>
 #include <stdio.h>
 
 namespace core {
@@ -14,7 +13,7 @@ namespace core {
 	Engine::Engine(scene::Scene* _mainScene) : mainScene(_mainScene)
 	{
 		isRunning = false;
-		//managers.push_back(new SystemManager());
+		managers.push_back(new SystemManager());
 	}
 
 
@@ -56,8 +55,8 @@ namespace core {
 
 	int Engine::run() {
 		isRunning = true;
-
-		while (!inputSystem.QuitRequested())
+		inputSystem = dynamic_cast<SystemManager*>(managers[0])->GetSystem<Input>();
+		while ( !inputSystem->QuitRequested())
 		{
 			// Update
 			Update();
@@ -78,7 +77,10 @@ namespace core {
 
 	void Engine::Update() {
 		mainScene->Update();
-		inputSystem.Update();
+		for (Manager* m : managers) {
+			m->Update();
+		}
+		
 		//Fill the surface white
 		SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
 

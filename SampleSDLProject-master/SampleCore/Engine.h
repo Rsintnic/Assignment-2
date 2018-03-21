@@ -32,7 +32,7 @@ namespace core {
 		bool isRunning;
 		scene::Scene* mainScene;
 		std::vector<Manager*> managers;
-		Input inputSystem;
+		Input* inputSystem;
 
 		bool Init();
 		void Update();

@@ -1,4 +1,7 @@
 #pragma once
+#ifndef SYSTEM_H
+#define SYSTEM_H
+
 
 namespace core {
 	enum class SystemType : unsigned __int8
@@ -24,3 +27,6 @@ namespace core {
 	};
 
 }
+
+
+#endif // !SYSTEM_H

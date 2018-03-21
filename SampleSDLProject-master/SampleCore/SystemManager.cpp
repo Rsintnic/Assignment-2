@@ -46,12 +46,12 @@ namespace core {
 			if (!s->Shutdown()) {
 				return false;
 			}
+			delete s;
+			s = nullptr;
 		}
-
+		systems.clear();
+		
 		return true;
 	}
-
-	System* SystemManager::GetSystem(SystemType system) {
-		return systems[0];
-	}
+	
 }
