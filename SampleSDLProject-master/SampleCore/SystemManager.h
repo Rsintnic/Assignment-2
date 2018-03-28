@@ -12,15 +12,23 @@ namespace core {
 	class SystemManager : public Manager
 	{
 		friend System;
+	private:
+		static SystemManager* m_instance;
+		SystemManager();
+	protected:
 		std::vector<System*> systems;
 	public:
-		SystemManager();
 		~SystemManager();
-
 		bool Init() override;
 		void Update() override;
 		void Draw() const override;
 		bool Shutdown() override;
+
+		static SystemManager* GetInstance() {
+			if (m_instance == nullptr)
+				m_instance = new SystemManager();
+			return m_instance;
+		;}
 
 		template<class T>
 		T* GetSystem() {
@@ -30,12 +38,7 @@ namespace core {
 					return system;
 				}
 			}
-			/*if (system == SystemType::) {
-			return systems[0];
-			}
-			else if (system == SystemType::WINDOW) {
-			return systems[1];
-			}*/
+			return nullptr;
 		}
 	};
 }

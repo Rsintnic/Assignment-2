@@ -21,8 +21,44 @@ namespace core {
 		while (SDL_PollEvent(&e) != 0)
 		{
 			//User requests quit
-			if (e.type == SDL_QUIT) {
+			switch(e.type){
+			case SDL_KEYDOWN:
+				switch (e.key.keysym.sym)
+				{
+				case SDLK_LEFT:
+					leftIsPressed = true;
+					break;
+				case SDLK_RIGHT:
+					rightIsPressed = true;
+					break;
+				case SDLK_UP:
+					upIsPressed = true;
+					break;
+				case SDLK_DOWN:
+					downIsPressed = true;
+					break;
+				}
+				break;
+			case SDL_KEYUP:
+				switch (e.key.keysym.sym)
+				{
+				case SDLK_LEFT:
+					leftIsPressed = false;
+					break;
+				case SDLK_RIGHT:
+					rightIsPressed = false;
+					break;
+				case SDLK_UP:
+					upIsPressed = false;
+					break;
+				case SDLK_DOWN:
+					downIsPressed = false;
+					break;
+				}
+				break;
+			case SDL_QUIT:
 				quitRequested = true;
+				break;
 			}
 		}
 	}
@@ -38,4 +74,5 @@ namespace core {
 	System* Input::make_system(SystemType type) {
 		return new Input();
 	}
+
 }

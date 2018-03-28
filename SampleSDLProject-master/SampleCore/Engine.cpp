@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include "SystemManager.h"
+#include "SceneManager.h"
+#include "Window.h"
 #include <stdio.h>
 
 namespace core {
@@ -10,10 +12,13 @@ namespace core {
 	const int SCREEN_WIDTH = 640;
 	const int SCREEN_HEIGHT = 480;
 
-	Engine::Engine(scene::Scene* _mainScene) : mainScene(_mainScene)
+	Engine::Engine(scene::Scene* _mainScene)
 	{
 		isRunning = false;
-		managers.push_back(new SystemManager());
+
+		managers.push_back(SceneManager::GetInstance());
+		managers.push_back(SystemManager::GetInstance());
+		dynamic_cast<SceneManager*>(managers[0])->AddScene(_mainScene);
 	}
 
 
@@ -21,41 +26,20 @@ namespace core {
 	{
 	}
 
-	int Engine::init()
+	bool Engine::Init()
 	{
-		int initResult = 0;
-		//Initialize SDL
-		if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
-		{
-			printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-
-			initResult = ENGINE_INIT_ERROR;
+		bool initResult = true;
+		for (Manager* m : managers) {
+			if (!m->Init())
+				initResult = false;
 		}
-		else
-		{
-			//Create window
-			window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-			if (window == NULL)
-			{
-				printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 
-				initResult = ENGINE_INIT_ERROR;
-			}
-			else
-			{
-				//Get window surface
-				screenSurface = SDL_GetWindowSurface(window);
-
-				//Wait two seconds
-				//SDL_Delay(2000);
-			}
-		}
 		return initResult;
 	}
 
 	int Engine::run() {
 		isRunning = true;
-		inputSystem = dynamic_cast<SystemManager*>(managers[0])->GetSystem<Input>();
+		Input* inputSystem = dynamic_cast<SystemManager*>(managers[1])->GetSystem<Input>();
 		while ( !inputSystem->QuitRequested())
 		{
 			// Update
@@ -69,41 +53,29 @@ namespace core {
 
 	}
 
-	bool Engine::Init() {
-		mainScene->Init();
-
-		return true;
-	}
-
 	void Engine::Update() {
-		mainScene->Update();
 		for (Manager* m : managers) {
 			m->Update();
 		}
-		
-		//Fill the surface white
-		SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
-
-		//Update the surface
-		SDL_UpdateWindowSurface(window);
 	}
 
 	void Engine::Draw() const{
-		mainScene->Draw();
+		for (Manager* m : managers) {
+			m->Draw();
+		}
 	}
 
 	bool Engine::Shutdown() {
-		if (!mainScene->Shutdown()) {
-			return 1;
+		
+		for (Manager* m : managers) {
+			if (!m->Shutdown())
+				return false;
 		}
-
-		//Destroy window
-		SDL_DestroyWindow(window);
 
 		//Quit SDL subsystems
 		SDL_Quit();
 
-		return 0;
+		return true;
 	}
 
 	void Engine::print()

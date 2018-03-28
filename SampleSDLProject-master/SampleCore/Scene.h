@@ -1,12 +1,12 @@
 #pragma once
-
+#include "GameObject.h"
 #include <vector>
 namespace scene {
 	class Scene
 	{
 	private:
-		std::vector<class GameObject*> gameObjects;
 	public:
+		std::vector<class GameObject*> gameObjects;
 		Scene();
 		virtual ~Scene();
 		virtual bool Init();

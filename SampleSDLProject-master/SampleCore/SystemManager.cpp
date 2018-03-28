@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "SystemManager.h"
-#include "System.h"
 #include "Input.h"
 #include "Window.h"
 
 namespace core {
+	SystemManager* SystemManager::m_instance = nullptr;
+
 	SystemManager::SystemManager()
 	{
 		systems.push_back(new Input());
@@ -24,10 +25,6 @@ namespace core {
 				return false;
 			}
 		}
-		/*for (size_t i = 0; i < static_cast<size_t>(SystemType::TOTAL_SYSTEMS); i++)
-		{
-
-		}*/
 		return true;
 	}
 
@@ -38,7 +35,9 @@ namespace core {
 	}
 
 	void SystemManager::Draw() const {
-
+		for (System* s : systems) {
+			s->Draw();
+		}
 	}
 
 	bool SystemManager::Shutdown() {
