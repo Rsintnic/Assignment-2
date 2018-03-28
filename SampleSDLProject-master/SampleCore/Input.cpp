@@ -37,7 +37,11 @@ namespace core {
 				case SDLK_DOWN:
 					downIsPressed = true;
 					break;
-				}
+
+				case SDLK_ESCAPE:
+					quitRequested = true;
+					break;
+				}	
 				break;
 			case SDL_KEYUP:
 				switch (e.key.keysym.sym)
